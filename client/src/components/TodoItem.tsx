@@ -6,9 +6,11 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure,
+  Input,
+  Textarea,
 } from "@heroui/react";
-import { Trash2 } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Trash2, Pencil } from "lucide-react";
 
 interface TodoItemProps {
   id: string;
@@ -17,6 +19,7 @@ interface TodoItemProps {
   completed: boolean;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string, title: string, description: string) => void;
 }
 
 export default function TodoItem({
@@ -26,15 +29,22 @@ export default function TodoItem({
   completed,
   onToggle,
   onDelete,
+  onEdit,
 }: TodoItemProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  console.log(id);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [isEditOpen, setEditOpen] = useState(false);
+  const [updatedTitle, setUpdatedTitle] = useState(title);
+  const [updatedDescription, setUpdatedDescription] = useState(description);
 
   const handleConfirmDelete = () => {
     onDelete(id);
-    onClose();
+    setDeleteOpen(false);
   };
+
+  const handleConfirmEdit = useCallback(() => {
+    onEdit(id, updatedTitle, updatedDescription);
+    setEditOpen(false);
+  }, [id, updatedTitle, updatedDescription]);
 
   return (
     <>
@@ -58,7 +68,14 @@ export default function TodoItem({
         </div>
 
         <button
-          onClick={onOpen}
+          onClick={() => setEditOpen(true)}
+          className="text-default-400 hover:text-danger transition-colors"
+          aria-label="Delete task"
+        >
+          <Pencil size={16} />
+        </button>
+        <button
+          onClick={() => setDeleteOpen(true)}
           className="text-default-400 hover:text-danger transition-colors"
           aria-label="Delete task"
         >
@@ -66,7 +83,11 @@ export default function TodoItem({
         </button>
       </div>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="sm">
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        size="sm"
+      >
         <ModalContent>
           <ModalHeader className="text-base">Delete Task</ModalHeader>
           <ModalBody>
@@ -77,11 +98,43 @@ export default function TodoItem({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>
+            <Button variant="flat" onPress={() => setDeleteOpen(false)}>
               Cancel
             </Button>
             <Button color="danger" onPress={handleConfirmDelete}>
               Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isEditOpen} onClose={() => setEditOpen(false)} size="md">
+        <ModalContent>
+          <ModalHeader className="text-base">Edit Task</ModalHeader>
+          <ModalBody>
+            <div className="text-sm text-default-600">
+              You can edit the task title and description.
+            </div>
+            <Input
+              placeholder="Task title"
+              defaultValue={title}
+              variant="bordered"
+              onValueChange={setUpdatedTitle}
+            />
+            <Textarea
+              placeholder="Task description"
+              defaultValue={description}
+              variant="bordered"
+              minRows={3}
+              onValueChange={setUpdatedDescription}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onPress={handleConfirmEdit}>
+              Edit
             </Button>
           </ModalFooter>
         </ModalContent>

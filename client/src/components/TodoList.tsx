@@ -32,6 +32,14 @@ export default function TaskList() {
     dispatch(removeTodo(id));
   };
 
+  const onEdit = async (id: string, title: string, description: string) => {
+    await patchTodo(id);
+    const updatedList = todos.map((todo) =>
+      todo.id === id ? { ...todo, title, description } : todo,
+    );
+    dispatch(setTodos(updatedList));
+  };
+
   const filteredTodos = todos.filter((todo) =>
     todo?.title?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -78,6 +86,7 @@ export default function TaskList() {
               completed={todoItem.completed}
               onToggle={onToggle}
               onDelete={onDelete}
+              onEdit={onEdit}
             />
           ))}
         </div>
