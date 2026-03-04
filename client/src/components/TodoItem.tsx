@@ -29,6 +29,8 @@ export default function TodoItem({
 }: TodoItemProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  console.log(id);
+
   const handleConfirmDelete = () => {
     onDelete(id);
     onClose();

@@ -3,8 +3,10 @@ import { v4 as uuid } from "uuid";
 import type { RootState } from "./store";
 
 interface TodoCreateTypes {
+  id?: string;
   title: string;
   description: string;
+  completed?: boolean;
 }
 interface Todo {
   id: string;
@@ -49,10 +51,13 @@ const todoSlice = createSlice({
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
+    setTodos: (state, action: PayloadAction<Todo[]>) => {
+      state.todos = action.payload;
+    },
   },
 });
 
-export const { addTodo, toggleTodo, removeTodo, setSearchQuery } =
+export const { addTodo, toggleTodo, removeTodo, setSearchQuery, setTodos } =
   todoSlice.actions;
 export default todoSlice.reducer;
 

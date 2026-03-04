@@ -24,11 +24,18 @@ export default function CreateTaskForm() {
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
-    // await createTodoApi({
-    //   title: title.trim(),
-    //   description: description.trim(),
-    // });
-    dispatch(addTodo({ title: title.trim(), description: description.trim() }));
+    const createdTask = await createTodoApi({
+      title: title.trim(),
+      description: description.trim(),
+    });
+    dispatch(
+      addTodo({
+        id: createdTask._id,
+        title: title.trim(),
+        description: description.trim(),
+        completed: false,
+      }),
+    );
 
     setTitle("");
     setDescription("");
@@ -38,9 +45,6 @@ export default function CreateTaskForm() {
     <Card className="w-full shadow-sm border border-default-200">
       <CardHeader className="flex flex-col items-start gap-1 pb-0">
         <h2 className="text-lg font-bold">Create New Task</h2>
-        <p className="text-sm text-default-500">
-          Add a specific objective to your list.
-        </p>
       </CardHeader>
       <CardBody className="flex flex-col gap-4 pt-4">
         <Input

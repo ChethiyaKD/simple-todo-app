@@ -11,7 +11,7 @@ export const handleError = (error: any) => {
   } else if (error.request) {
     addToast({
       title: "Error",
-      description: error.request.data.message,
+      description: error.request.message,
       color: alertColors.error,
     });
   } else {

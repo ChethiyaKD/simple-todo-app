@@ -11,7 +11,7 @@ const getAllTodo = async (req, res) => {
         const todos = await TaskModel.find({ user: user._id });
         if (!todos) return res.status(404).json({ message: 'Todos not found' });
 
-        res.status(200).json({ message: 'Todos fetched successfully', data: todos });
+        res.status(200).json({ message: 'Todos fetched successfully', data: todos.map(todo => ({ title: todo.title, description: todo.description, completed: todo.done, id: todo._id })) });
     }
     catch (error) {
         console.log(`Error: ${error.message}`);

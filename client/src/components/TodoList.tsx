@@ -1,29 +1,57 @@
 import { Chip } from "@heroui/react";
 import TodoItem from "./TodoItem";
 import { useSelector, useDispatch } from "react-redux";
-import { todoSelector, toggleTodo, removeTodo } from "@/redux/todoSlice";
+import {
+  todoSelector,
+  toggleTodo,
+  removeTodo,
+  setTodos,
+} from "@/redux/todoSlice";
 import type { AppDispatch } from "@/redux/store";
-import { deleteTodo, patchTodo } from "@/api/todoApi";
+import { deleteTodo, patchTodo, getTodos } from "@/api/todoApi";
+import { useCallback, useEffect } from "react";
+import { authSelector, setToken } from "@/redux/authSlice";
+import { getAuthToken } from "@/api/authApi";
+import type { Todo } from "@/types";
 
 export default function TaskList() {
   const todos = useSelector(todoSelector).todos;
   const searchQuery = useSelector(todoSelector).searchQuery;
   const activeCount = todos.filter((t) => !t.completed).length;
+  const isToken = !!useSelector(authSelector).token;
+
   const dispatch = useDispatch<AppDispatch>();
 
   const onToggle = async (id: string) => {
-    // dispatch(toggleTodo(id));
+    dispatch(toggleTodo(id));
     await patchTodo(id);
   };
 
   const onDelete = async (id: string) => {
-    // await deleteTodo(id);
+    await deleteTodo(id);
     dispatch(removeTodo(id));
   };
 
   const filteredTodos = todos.filter((todo) =>
-    todo.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    todo?.title?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const fetchTodos = useCallback(async () => {
+    const response = (await getTodos()) as { data: Todo[] };
+    dispatch(setTodos(response.data));
+  }, [isToken]);
+
+  useEffect(() => {
+    if (isToken) {
+      fetchTodos();
+      return;
+    }
+
+    (async () => {
+      const response = await getAuthToken();
+      dispatch(setToken(response.data));
+    })();
+  }, [isToken]);
 
   return (
     <div className="flex flex-col gap-3">
