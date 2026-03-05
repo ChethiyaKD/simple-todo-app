@@ -8,7 +8,7 @@ import {
   setTodos,
 } from "@/redux/todoSlice";
 import type { AppDispatch } from "@/redux/store";
-import { deleteTodo, patchTodo, getTodos } from "@/api/todoApi";
+import { deleteTodo, patchTodo, getTodos, updateTodo } from "@/api/todoApi";
 import { useCallback, useEffect } from "react";
 import { authSelector, setToken } from "@/redux/authSlice";
 import { getAuthToken } from "@/api/authApi";
@@ -33,7 +33,7 @@ export default function TaskList() {
   };
 
   const onEdit = async (id: string, title: string, description: string) => {
-    await patchTodo(id);
+    await updateTodo({ title, description }, id);
     const updatedList = todos.map((todo) =>
       todo.id === id ? { ...todo, title, description } : todo,
     );
